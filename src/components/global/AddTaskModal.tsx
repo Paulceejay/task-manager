@@ -1,17 +1,53 @@
 import { useEffect, useState } from "react";
-import Button from "./Button"
-import Modal from "./Modal"
+import UseAddTask from "../../hooks/useAddTask";
+import Button from "./Button";
+import Modal from "./Modal";
 
-const AddTaskModal = ({onClose}) => {
-   const [taskMgtItems, setTaskMgtItems] = useState([]);
-       useEffect(() => {
-         localStorage.setItem("taskMgtItems", JSON.stringify(taskMgtItems));
-       },[taskMgtItems])
+const currentDate = new Date().toJSON().slice(0, 10);
 
-    return (
-      <Modal onClose={onClose}>
-        <form className="py-5" action="">
-          <p onClick={onClose} className="text-gray-500 font-semibold text-xl md:text-2xl absolute top-5 right-10">
+const AddTaskModal = ({ onClose }) => {
+  const [success, setSuccess] = useState(false)
+
+  const {
+    value: enteredTitle,
+    valueChangeHandler: titleChangeHandler,
+  } = UseAddTask((value) => value.trim() !== "");
+  const {
+    value: enteredDesc,
+    valueChangeHandler: descChangeHandler,
+  } = UseAddTask((value) => value.trim() !== "");
+  const {
+    value: enteredDate,
+    valueChangeHandler: dateChangeHandler,
+  } = UseAddTask((value) => value.trim() !== "");
+
+   const formSubmissionHandler = (event) => {
+     event.preventDefault();
+     
+      const formData = {
+        title: enteredTitle,
+        message: enteredDesc,
+        date: enteredDate,
+        id: Math.random().toString(),
+      };
+    const storedItems =  JSON.parse(localStorage.getItem("tasksMgt")) || [];
+storedItems.push(formData)
+
+ localStorage.setItem("tasksMgt", JSON.stringify(storedItems));
+    setSuccess(true)
+   };
+  return (
+    <Modal onClose={onClose}>
+      {!success && (
+        <form
+          onSubmit={formSubmissionHandler}
+          className="py-5 overflow-scroll scroll-auto"
+          action=""
+        >
+          <p
+            onClick={onClose}
+            className="text-gray-500 font-semibold text-xl md:text-2xl absolute top-5 right-10 cursor-pointer"
+          >
             x
           </p>
           <h2 className="capitalize font-semibold text-xl md:text-2xl mt-5">
@@ -25,10 +61,13 @@ const AddTaskModal = ({onClose}) => {
               Task Name
             </label>
             <input
-              className="w-full outline-none border-2 border-gray-400 text-gray-300 text-lg px-4 h-14 rounded-lg"
+              className="w-full outline-none border-2 border-gray-400 text-lg px-4 h-14 rounded-lg"
               type="text"
               id="taskName"
               placeholder="Task Name"
+              required
+              onChange={titleChangeHandler}
+              value={enteredTitle}
             />
           </div>
           <div className="flex justify-between flex-col mt-5">
@@ -39,10 +78,13 @@ const AddTaskModal = ({onClose}) => {
               Your Description
             </label>
             <textarea
-              className="w-full outline-none border-2 border-gray-400 text-gray-300 text-lg py-1 px-4 h-20"
+              className="w-full outline-none border-2 border-gray-400 text-lg py-1 px-4 h-20"
               name="taskDesc"
               id="taskDesc"
               placeholder="Write Your Task Description..."
+              required
+              onChange={descChangeHandler}
+              value={enteredDesc}
             ></textarea>
           </div>
           <div className="flex justify-between flex-col mt-5">
@@ -53,10 +95,14 @@ const AddTaskModal = ({onClose}) => {
               Task Date
             </label>
             <input
-              className="w-full outline-none border-2 border-gray-400 text-gray-300 text-lg px-4 h-14 rounded-lg"
-              type="datetime-local"
+              className="w-full outline-none border-2 border-gray-400 text-lg px-4 h-14 rounded-lg"
+              type="date"
               name="taskDate"
               id="taskDate"
+              min={currentDate}
+              required
+              onChange={dateChangeHandler}
+              value={enteredDate}
             />
           </div>
 
@@ -64,8 +110,15 @@ const AddTaskModal = ({onClose}) => {
             Add Task
           </Button>
         </form>
-      </Modal>
-    );
-}
+      )}
 
-export default AddTaskModal
+      {success && (
+        <div className="flex justify-center items-ceneter py-5">
+          <p className="text-green-500 text-lg">Task Added Successfully</p>
+        </div>
+      )}
+    </Modal>
+  );
+};
+
+export default AddTaskModal;

@@ -3,7 +3,7 @@ import ReactDOM from "react-dom";
 const Backdrop = ({onClick}) => {
   return (
     <div
-      className="w-full h-full fixed z-30 bg-[#000000BF]"
+      className="w-full h-full fixed z-30 bg-[#000000BF] overflow-scroll"
       onClick={onClick}
     ></div>
   );

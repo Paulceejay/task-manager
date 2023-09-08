@@ -6,7 +6,8 @@ import TaskList from "./TaskList.tsx";
 const Layout = () => {
     const [addModal, setAddModal] = useState(false)
     const onCloseHandler = () => {
-        setAddModal((prev => !prev))
+        setAddModal((prev => !prev))  
+        window.location.reload();
     }
 
      const onOpenHandler = () => {
