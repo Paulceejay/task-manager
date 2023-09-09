@@ -9,6 +9,7 @@ const UseAddTask = (validateValue) => {
 
   return {
     value: enteredValue,
+    setEnteredValue,
     valueChangeHandler,
   };
 };

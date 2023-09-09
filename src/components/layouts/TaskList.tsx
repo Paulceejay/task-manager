@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Button from "../global/Button";
-
+import EditTaskModal from "../global/EditTaskModal";
 import EmptyTask from "./EmptyTask";
 import TaskItems from "./TaskItems";
 
@@ -10,6 +10,7 @@ const TaskList = ({ onOpen }) => {
   const [items, setItems] = useState(initialItems);
   const [isEditing, setIsEditing] = useState(false)
   const [taskToEdit, setTaskToEdit] = useState({});
+  const [taskId, setTaskId] = useState(null)
 
   const deleteTask = (id) => {
     const updatedItems = items.filter((task) => task.id !== id);
@@ -20,8 +21,29 @@ const TaskList = ({ onOpen }) => {
     window.location.reload()
   };
 
- 
+  const editingTask = (id) => {
+    let newTask = items.find((item) => item.id === id)
+    setTaskToEdit(newTask)
+    setIsEditing(true)
+    setTaskId(newTask.id)
+  }
 
+  const onUpdateHandler = (id) => {
+    setItems(items.map((item) => {
+      if(item.id === taskId){
+        return item.id = id
+      }
+      return item
+    }))
+    
+  }
+
+  const closeHandler = () => {
+    setIsEditing(false)
+  }
+if(isEditing){
+  localStorage.setItem("tasksMgt", JSON.stringify(items));
+}
   if (items.length === 0) {
     return <EmptyTask onClick={onOpen} />;
   }
@@ -41,6 +63,7 @@ const TaskList = ({ onOpen }) => {
           {items.map((task) => (
             <TaskItems
               onDelete={() => deleteTask(task.id)}
+              onEdit={() => editingTask(task.id)}
               key={task.id}
               date={task.date}
               message={task.message}
@@ -48,7 +71,7 @@ const TaskList = ({ onOpen }) => {
             />
           ))}
         </div>
- 
+        {isEditing && <EditTaskModal onClose={closeHandler} editingTask={isEditing} taskToEdit={taskToEdit} onUpdate={onUpdateHandler} />}
       </>
     );
   }
